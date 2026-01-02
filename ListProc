@@ -1,0 +1,84 @@
+Sub A01_ListProc()
+
+    Dim file As Object
+    Dim folder As Object
+    Dim fso As Object
+    Dim ValueNuProc As String
+    Dim ValueNuRev As String
+    Dim ValueDate As String
+    Dim ValueAct As String
+    Dim Num As String
+    Dim NuRev As String
+    Dim Dates As String
+    Dim Act As String
+    Dim row As Integer
+    Dim rowDoth As Integer
+    Dim Number As Integer
+    Dim wb As Workbook
+    Dim cell As range
+    Dim triangle As Shape
+    Dim triangleHeight As Double
+    Dim sideLength As Double
+
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    Set folder = fso.GetFolder(ActiveWorkbook.Path)
+    row = 24
+    Number = 1
+    rowDoth = Val(ThisWorkbook.Sheets(1).range("E3").value)
+    Num = ThisWorkbook.Sheets(1).range("F3").value
+    NuRev = ThisWorkbook.Sheets(1).range("G3").value
+    Dates = ThisWorkbook.Sheets(1).range("H3").value
+    Act = ThisWorkbook.Sheets(1).range("I3").value
+    
+    ThisWorkbook.Sheets("listProc").Copy Before:=ActiveWorkbook.Sheets(1)
+    
+    For Each file In folder.Files
+        If file.Name <> ActiveWorkbook.Name And (file.Attributes And 2) = 0 Then
+            Set wb = Workbooks.Open(file)
+            ValueNuProc = wb.Sheets(1).range(Num).value
+            
+            Do While rowDoth >= 1
+                ValueNuRev = wb.Sheets(1).range(NuRev & rowDoth).value
+                ValueDate = wb.Sheets(1).range(Dates & rowDoth).value
+                ValueAct = wb.Sheets(1).range(Act & rowDoth).value
+                If ValueNuRev <> "" Or ValueDate <> "" Or ValueAct <> "" Then
+                    Exit Do
+                End If
+                rowDoth = rowDoth - 1
+            Loop
+            
+            rowDoth = Val(ThisWorkbook.Sheets(1).range("E3").value)
+            wb.Close SaveChanges:=False
+            Set cell = ActiveWorkbook.Sheets(1).range("C" & row)
+            sideLength = Application.WorksheetFunction.Min(cell.Width * 0.9, cell.Height * 0.9 * 2 / Sqr(3))
+            triangleHeight = sideLength * Sqr(3) / 2
+            Set triangle = ActiveWorkbook.Sheets(1).Shapes.AddShape(msoShapeIsoscelesTriangle, _
+                                       cell.Left + (cell.Width - sideLength) / 2, _
+                                       cell.Top + (cell.Height - triangleHeight) / 2, _
+                                       sideLength, triangleHeight)
+            triangle.Fill.Visible = msoFalse
+            triangle.Line.Weight = 1
+            triangle.Line.ForeColor.RGB = RGB(0, 0, 0)
+            range("A" & row).value = Number
+            range("B" & row).value = ValueNuProc
+            range("C" & row).value = ValueNuRev
+            range("E" & row).value = ValueAct
+            
+            If IsDate(ValueDate) Then
+                range("D" & row).value = CDate(ValueDate)
+                range("D" & row).NumberFormat = "dd/mm/yyyy"
+            Else
+                range("D" & row).value = "not date"
+            End If
+            
+        Number = Number + 1
+        row = row + 1
+        End If
+    Next file
+    
+    Set file = Nothing
+    Set folder = Nothing
+    Set fso = Nothing
+    Set wb = Nothing
+    
+End Sub
