@@ -1,0 +1,74 @@
+Sub A03_Deshif()
+    Dim folderPath As String
+    Dim fd As FileDialog
+    Dim lastRow As Long
+    
+    ThisWorkbook.Sheets("Deshif").range("E3:AJ3").ClearContents
+    lastRow = ThisWorkbook.Sheets("Deshif").Cells(ThisWorkbook.Sheets("Deshif").Rows.Count, "B").End(xlUp).row
+    If lastRow >= 4 Then
+        ThisWorkbook.Sheets("Deshif").range("B4:B" & lastRow).ClearContents
+    End If
+    
+    Set fd = Application.FileDialog(msoFileDialogFolderPicker)
+    
+    If fd.Show = -1 Then
+        folderPath = fd.SelectedItems(1) & "\"
+        Call ListFilesInSubFolder(folderPath, 4)
+    Else
+        MsgBox "Папка не выбрана.", vbExclamation
+    End If
+    
+    Set fd = Nothing
+End Sub
+
+Sub ListFilesInSubFolder(ByVal folderPath As String, ByRef row As Integer)
+    Dim fso As Object
+    Dim folder As Object
+    Dim file As Object
+    Dim shell As Object
+    Dim wb As Workbook
+    Dim NewWb As Workbook
+    Dim ws As Worksheet
+    Dim DeshifSheet As Worksheet
+
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    Set shell = CreateObject("WScript.Shell")
+    Set DeshifSheet = ThisWorkbook.Sheets("Deshif")
+    Set folder = fso.GetFolder(folderPath)
+    
+    For Each file In folder.Files
+
+        Set wb = Workbooks.Open(file)
+        Set NewWb = Workbooks.Add(xlWBATWorksheet)
+        
+        For Each ws In wb.Sheets
+            ws.Copy After:=NewWb.Sheets(NewWb.Sheets.Count)
+        Next ws
+        
+        If NewWb.Sheets.Count > 1 Then
+            Application.DisplayAlerts = False
+            NewWb.Sheets(1).Delete
+            Application.DisplayAlerts = True
+        End If
+        
+        wb.Close SaveChanges:=False
+        NewWb.SaveAs file.Path & ".slx", FileFormat:=51
+        NewWb.Close SaveChanges:=False
+        
+        DeshifSheet.range("B" & row).value = file.Path & ".slx"
+        row = row + 1
+        
+        shell.Run "cmd /c del """ & file.Path & """", 0, True
+        
+    Next file
+    
+    Set file = Nothing
+    Set folder = Nothing
+    Set fso = Nothing
+    Set shell = Nothing
+    Set wb = Nothing
+    Set NewWb = Nothing
+    Set ws = Nothing
+    Set DeshifSheet = Nothing
+
+End Sub
