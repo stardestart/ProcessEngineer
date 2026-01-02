@@ -1,0 +1,50 @@
+Sub A04_lnkCreate()
+    Dim folderPath As String
+    Dim fd As FileDialog
+    Dim lastRow As Long
+    
+    ThisWorkbook.Sheets("lnkCreate").range("D3:AK3").ClearContents
+    lastRow = ThisWorkbook.Sheets("lnkCreate").Cells(ThisWorkbook.Sheets("lnkCreate").Rows.Count, "C").End(xlUp).row
+    If lastRow >= 4 Then
+        ThisWorkbook.Sheets("lnkCreate").range("A4:C" & lastRow).ClearContents
+        ThisWorkbook.Sheets("lnkCreate").range("A4:C" & lastRow).Interior.ColorIndex = xlNone
+    End If
+    
+    Set fd = Application.FileDialog(msoFileDialogFolderPicker)
+    
+    If fd.Show = -1 Then
+        folderPath = fd.SelectedItems(1) & "\"
+        Call ListFilesInSubFolder(folderPath, 4, 1)
+    Else
+        MsgBox "Папка не выбрана.", vbExclamation
+    End If
+    
+    Set fd = Nothing
+End Sub
+
+Sub ListFilesInSubFolder(ByVal folderPath As String, ByRef row As Integer, ByRef rowN As Integer)
+    Dim lnkCreate As Worksheet
+    Dim file As Object
+    Dim folder As Object
+    Dim fso As Object
+    
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    Set folder = fso.GetFolder(folderPath)
+    Set lnkCreate = ThisWorkbook.Sheets("lnkCreate")
+
+    For Each file In folder.Files
+        lnkCreate.Hyperlinks.Add Anchor:=lnkCreate.range("A" & row), _
+            Address:=file.Path, _
+            TextToDisplay:=file.Path
+        lnkCreate.range("B" & row).value = file.Name
+        lnkCreate.range("C" & row).value = rowN
+        row = row + 1
+        rowN = rowN + 1
+    Next file
+    
+    Set lnkCreate = Nothing
+    Set file = Nothing
+    Set folder = Nothing
+    Set fso = Nothing
+    
+End Sub
