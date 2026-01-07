@@ -8,13 +8,13 @@ Sub A07_TCWork()
     If fd.Show = -1 Then
         folderPath = fd.SelectedItems(1) & "\"
     Else
-        MsgBox "Папка не выбрана.", vbExclamation
+        MsgBox "Ïàïêà íå âûáðàíà.", vbExclamation
         Exit Sub
     End If
     If fd.Show = -1 Then
         folderPath2 = fd.SelectedItems(1) & "\"
     Else
-        MsgBox "Папка не выбрана.", vbExclamation
+        MsgBox "Ïàïêà íå âûáðàíà.", vbExclamation
         Exit Sub
     End If
     Call ListFilesInSubFolder(folderPath, folderPath2)
@@ -33,6 +33,7 @@ Sub ListFilesInSubFolder(ByVal folderPath As String, ByVal folderPath2 As String
     Dim folder As Object
     Dim wb As Workbook
     Dim NewWb As Workbook
+    Dim transl As Workbook
     Dim range1 As range
     Dim range12 As String
     Dim range2 As range
@@ -45,25 +46,42 @@ Sub ListFilesInSubFolder(ByVal folderPath As String, ByVal folderPath2 As String
     Dim xRg As range
     Dim xPicRg As range
     Dim counter As Integer
+    Dim NumOper As Integer
+    Dim row As Long
     Dim formattedNumber As String
     Dim first As String
 
-    pic = ThisWorkbook.Sheets("tc").range("A43").value
-    NumProc = ThisWorkbook.Sheets("tc").range("P78").value
-    model = ThisWorkbook.Sheets("tc").range("G75").value
-    oper = ThisWorkbook.Sheets("tc").range("J75").value
+    pic = ThisWorkbook.Sheets("TCWork").range("A58").value
+    NumProc = ThisWorkbook.Sheets("TCWork").range("P104").value
+    model = ThisWorkbook.Sheets("TCWork").range("G101").value
+    oper = ThisWorkbook.Sheets("TCWork").range("J101").value
     Set fso = CreateObject("Scripting.FileSystemObject")
     Set folder = fso.GetFolder(folderPath)
     counter = 2
+    row = 4
+    Set transl = Workbooks.Add(xlWBATWorksheet)
+    transl.Sheets(1).range("A:A,B:B,C:C,D:D,E:E").ColumnWidth = 100
+    transl.Sheets(1).range("A3:E3").Borders.LineStyle = xlContinuous
+    transl.Sheets(1).range("A3:E3").Borders.Weight = xlThick
+    transl.Sheets(1).range("A3:E3").Interior.Color = RGB(255, 255, 158)
+    transl.Sheets(1).range("A3:E3").Font.Bold = True
+    transl.Sheets(1).range("A3:E3").Font.Name = "Modern H Medium"
+    transl.Sheets(1).range("A3").value = "FILE"
+    transl.Sheets(1).range("B3").value = "OPERATION"
+    transl.Sheets(1).range("C3").value = "translation OPERATION"
+    transl.Sheets(1).range("D3").value = "OPERATION NAME"
+    transl.Sheets(1).range("E3").value = "translation OPERATION NAME"
+    transl.Sheets(1).Name = "transl"
+    Application.ScreenUpdating = False
     
     For Each file In folder.Files
     
         Set wb = Workbooks.Open(file)
         
-        
+        NumOper = ThisWorkbook.Sheets("TCWork").range("K72").value - ThisWorkbook.Sheets("TCWork").range("K61").value + 1
         
         lastRow = wb.Sheets(1).Cells(wb.Sheets(1).Rows.Count, 1).End(xlUp).row
-        lastCol = wb.Sheets(1).range(ThisWorkbook.Sheets("tc").range("R80").value & ":" & ThisWorkbook.Sheets("tc").range("R80").value).Column
+        lastCol = wb.Sheets(1).range(ThisWorkbook.Sheets("TCWork").range("S56").value & ":" & ThisWorkbook.Sheets("TCWork").range("S56").value).Column
         Set range1 = wb.Sheets(1).range(wb.Sheets(1).Cells(1, 1), wb.Sheets(1).Cells(1, lastCol))
         
         For Each cell1 In range1
@@ -87,7 +105,6 @@ Sub ListFilesInSubFolder(ByVal folderPath As String, ByVal folderPath2 As String
                 NewWb.Sheets(1).Unprotect
                 NewWb.Sheets(1).Select
                 
-        
                 For Each xPic In NewWb.Sheets(1).Shapes
                     Set xRg = range(NewWb.Sheets(1).Cells(1, 1), NewWb.Sheets(1).Cells(i - 1, lastCol))
                     Set xPicRg = range(xPic.TopLeftCell.Address & ":" & xPic.BottomRightCell.Address)
@@ -115,20 +132,20 @@ Sub ListFilesInSubFolder(ByVal folderPath As String, ByVal folderPath2 As String
                 NewWb.Sheets.Add Before:=Sheets(1)
                 Sheets(1).Name = "a"
         
-                NewWb.Sheets(1).Rows("1:39").RowHeight = 20
                 NewWb.Sheets(1).range("A:A,G:G,H:H").ColumnWidth = 3
-                NewWb.Sheets(1).range("B:B,D:D,E:E,F:F").ColumnWidth = 10
+                NewWb.Sheets(1).range("B:B").ColumnWidth = 20
+                NewWb.Sheets(1).range("D:D,E:E,F:F").ColumnWidth = 10
                 NewWb.Sheets(1).range("C:C").ColumnWidth = 30
                 NewWb.Sheets(1).range("I:I").ColumnWidth = 17
                 NewWb.Sheets(1).range("J:J").ColumnWidth = 23
                 NewWb.Sheets(1).range("K:K").ColumnWidth = 7
                 NewWb.Sheets(1).range("N:N").ColumnWidth = 6
                 NewWb.Sheets(1).range("M:M,O:O,P:P,Q:Q,R:R").ColumnWidth = 8
-                ThisWorkbook.Sheets("tc").range("A1:R39").Copy
+                ThisWorkbook.Sheets("TCWork").range("A1:R52").Copy
                 NewWb.Sheets(1).Paste
         
                 Application.PrintCommunication = True
-                NewWb.Sheets(1).PageSetup.PrintArea = "$A$1:$R$39"
+                NewWb.Sheets(1).PageSetup.PrintArea = "$A$1:$R$52"
                 ActiveWindow.View = xlPageBreakPreview
                 With ActiveSheet.PageSetup
                     .LeftHeader = ""
@@ -181,29 +198,39 @@ Sub ListFilesInSubFolder(ByVal folderPath As String, ByVal folderPath2 As String
         
         
                 NewWb.Sheets(2).range(pic).Copy
-                NewWb.Sheets(1).range("A3:F25").Select
+                NewWb.Sheets(1).range("A3:F35").Select
                 NewWb.Sheets(1).Pictures.Paste
                 Set pict = NewWb.Sheets(1).Pictures(NewWb.Sheets(1).Pictures.Count)
         
-                If range("A3:F25").Width / range("A3:F25").Height > (pict.Width / pict.Height) Then
-                    pict.Width = range("A3:F25").Height * (pict.Width / pict.Height)
-                    pict.Height = range("A3:F25").Height
-                    pict.Top = range("A3:F25").Top + (range("A3:F25").Height - range("A3:F25").Height) / 2
-                    pict.Left = range("A3:F25").Left + (range("A3:F25").Width - range("A3:F25").Height * (pict.Width / pict.Height)) / 2
+                If range("A3:F35").Width / range("A3:F35").Height > (pict.Width / pict.Height) Then
+                    pict.Width = range("A3:F35").Height * (pict.Width / pict.Height)
+                    pict.Height = range("A3:F35").Height
+                    pict.Top = range("A3:F35").Top + (range("A3:F35").Height - range("A3:F35").Height) / 2
+                    pict.Left = range("A3:F35").Left + (range("A3:F35").Width - range("A3:F35").Height * (pict.Width / pict.Height)) / 2
                 Else
-                    pict.Width = range("A3:F25").Width
-                    pict.Height = range("A3:F25").Width / (pict.Width / pict.Height)
-                    pict.Top = range("A3:F25").Top + (range("A3:F25").Height - range("A3:F25").Width / (pict.Width / pict.Height)) / 2
-                    pict.Left = range("A3:F25").Left + (range("A3:F25").Width - range("A3:F25").Width) / 2
+                    pict.Width = range("A3:F35").Width
+                    pict.Height = range("A3:F35").Width / (pict.Width / pict.Height)
+                    pict.Top = range("A3:F35").Top + (range("A3:F35").Height - range("A3:F35").Width / (pict.Width / pict.Height)) / 2
+                    pict.Left = range("A3:F35").Left + (range("A3:F35").Width - range("A3:F35").Width) / 2
                 End If
         
-                NewWb.Sheets(1).range("B35").value = NewWb.Sheets(2).range(NumProc).value
-                NewWb.Sheets(1).range("N38").value = ThisWorkbook.Sheets("tc").range("N78").value + "_" + NewWb.Sheets(2).range(NumProc).value + "-" + formattedNumber
-                NewWb.Sheets(1).range("D35, G39, J39, K39").value = Date
-                NewWb.Sheets(1).range("G35").value = NewWb.Sheets(2).range(model).value
-                NewWb.Sheets(1).range("J35").value = NewWb.Sheets(2).range(oper).value
+                NewWb.Sheets(1).range("B46").value = NewWb.Sheets(2).range(NumProc).value
+                NewWb.Sheets(1).range("N49").value = ThisWorkbook.Sheets("TCWork").range("N104").value + "_" + NewWb.Sheets(2).range(NumProc).value + "-" + formattedNumber
+                
+                NewWb.Sheets(1).range("N49").Replace What:="/", Replacement:="%", LookAt:=xlPart, SearchOrder _
+                    :=xlByRows, MatchCase:=False, SearchFormat:=False, ReplaceFormat:=False
+                NewWb.Sheets(1).range("N49").Replace What:="\", Replacement:="%", LookAt:=xlPart, SearchOrder _
+                    :=xlByRows, MatchCase:=False, SearchFormat:=False, ReplaceFormat:=False
         
-                NewWb.SaveAs folderPath2 & file.Name & "-" & formattedNumber & ".slx", FileFormat:=51
+                NewWb.Sheets(1).range("D46, G50, J50, K50").value = Date
+                NewWb.Sheets(1).range("G46").value = NewWb.Sheets(2).range(model).value
+                NewWb.Sheets(1).range("J46").value = NewWb.Sheets(2).range(oper).value
+        
+                NewWb.SaveAs folderPath2 & NewWb.Sheets(1).range("N49").value & ".slx", FileFormat:=51
+                transl.Sheets(1).range("B" & row & ":" & "B" & row + NumOper - 1).value = NewWb.Sheets(2).range(ThisWorkbook.Sheets("TCWork").range("J61").value & ThisWorkbook.Sheets("TCWork").range("K61").value & ":" & ThisWorkbook.Sheets("TCWork").range("J61").value & ThisWorkbook.Sheets("TCWork").range("K72").value).value
+                transl.Sheets(1).range("A" & row).value = folderPath2 & NewWb.Sheets(1).range("N49").value & ".slx"
+                transl.Sheets(1).range("D" & row).value = NewWb.Sheets(1).range("J46").value
+                row = row + NumOper
                 NewWb.Close SaveChanges:=False
                 
                 wb.Sheets(1).Unprotect
@@ -233,19 +260,20 @@ Sub ListFilesInSubFolder(ByVal folderPath As String, ByVal folderPath2 As String
         wb.Sheets.Add Before:=Sheets(1)
         Sheets(1).Name = "a"
         
-        wb.Sheets(1).Rows("1:39").RowHeight = 20
         wb.Sheets(1).range("A:A,G:G,H:H").ColumnWidth = 3
-        wb.Sheets(1).range("B:B,D:D,E:E,F:F").ColumnWidth = 10
+        wb.Sheets(1).range("B:B").ColumnWidth = 20
+        wb.Sheets(1).range("D:D,E:E,F:F").ColumnWidth = 10
         wb.Sheets(1).range("C:C").ColumnWidth = 30
         wb.Sheets(1).range("I:I").ColumnWidth = 17
         wb.Sheets(1).range("J:J").ColumnWidth = 23
         wb.Sheets(1).range("K:K").ColumnWidth = 7
         wb.Sheets(1).range("N:N").ColumnWidth = 6
         wb.Sheets(1).range("M:M,O:O,P:P,Q:Q,R:R").ColumnWidth = 8
-        ThisWorkbook.Sheets("tc").range("A1:R39").Copy
+        ThisWorkbook.Sheets("TCWork").range("A1:R52").Copy
         wb.Sheets(1).Paste
+        
         Application.PrintCommunication = True
-        wb.Sheets(1).PageSetup.PrintArea = "$A$1:$R$39"
+        wb.Sheets(1).PageSetup.PrintArea = "$A$1:$R$52"
         ActiveWindow.View = xlPageBreakPreview
         With ActiveSheet.PageSetup
             .LeftHeader = ""
@@ -302,26 +330,36 @@ Sub ListFilesInSubFolder(ByVal folderPath As String, ByVal folderPath2 As String
         wb.Sheets(1).Pictures.Paste
         Set pict = wb.Sheets(1).Pictures(wb.Sheets(1).Pictures.Count)
         
-        If range("A3:F25").Width / range("A3:F25").Height > (pict.Width / pict.Height) Then
-            pict.Width = range("A3:F25").Height * (pict.Width / pict.Height)
-            pict.Height = range("A3:F25").Height
-            pict.Top = range("A3:F25").Top + (range("A3:F25").Height - range("A3:F25").Height) / 2
-            pict.Left = range("A3:F25").Left + (range("A3:F25").Width - range("A3:F25").Height * (pict.Width / pict.Height)) / 2
+        If range("A3:F35").Width / range("A3:F35").Height > (pict.Width / pict.Height) Then
+            pict.Width = range("A3:F35").Height * (pict.Width / pict.Height)
+            pict.Height = range("A3:F35").Height
+            pict.Top = range("A3:F35").Top + (range("A3:F35").Height - range("A3:F35").Height) / 2
+            pict.Left = range("A3:F35").Left + (range("A3:F35").Width - range("A3:F35").Height * (pict.Width / pict.Height)) / 2
         Else
-            pict.Width = range("A3:F25").Width
-            pict.Height = range("A3:F25").Width / (pict.Width / pict.Height)
-            pict.Top = range("A3:F25").Top + (range("A3:F25").Height - range("A3:F25").Width / (pict.Width / pict.Height)) / 2
-            pict.Left = range("A3:F25").Left + (range("A3:F25").Width - range("A3:F25").Width) / 2
+            pict.Width = range("A3:F35").Width
+            pict.Height = range("A3:F35").Width / (pict.Width / pict.Height)
+            pict.Top = range("A3:F35").Top + (range("A3:F35").Height - range("A3:F35").Width / (pict.Width / pict.Height)) / 2
+            pict.Left = range("A3:F35").Left + (range("A3:F35").Width - range("A3:F35").Width) / 2
         End If
         
-        wb.Sheets(1).range("B35").value = wb.Sheets(2).range(NumProc).value
-        wb.Sheets(1).range("N38").value = ThisWorkbook.Sheets("tc").range("N78").value + "_" + wb.Sheets(2).range(NumProc).value + first
-        wb.Sheets(1).range("D35, G39, J39, K39").value = Date
-        wb.Sheets(1).range("G35").value = wb.Sheets(2).range(model).value
-        wb.Sheets(1).range("J35").value = wb.Sheets(2).range(oper).value
+        wb.Sheets(1).range("B46").value = wb.Sheets(2).range(NumProc).value
+        wb.Sheets(1).range("N49").value = ThisWorkbook.Sheets("TCWork").range("N104").value + "_" + wb.Sheets(2).range(NumProc).value + first
+        
+        wb.Sheets(1).range("N49").Replace What:="/", Replacement:="%", LookAt:=xlPart, SearchOrder _
+                    :=xlByRows, MatchCase:=False, SearchFormat:=False, ReplaceFormat:=False
+        wb.Sheets(1).range("N49").Replace What:="\", Replacement:="%", LookAt:=xlPart, SearchOrder _
+                    :=xlByRows, MatchCase:=False, SearchFormat:=False, ReplaceFormat:=False
+                    
+        wb.Sheets(1).range("D46, G50, J50, K50").value = Date
+        wb.Sheets(1).range("G46").value = wb.Sheets(2).range(model).value
+        wb.Sheets(1).range("J46").value = wb.Sheets(2).range(oper).value
         
         Application.CutCopyMode = False
-        wb.SaveAs folderPath2 & file.Name & first & ".slx", FileFormat:=51
+        wb.SaveAs folderPath2 & wb.Sheets(1).range("N49").value & ".slx", FileFormat:=51
+        transl.Sheets(1).range("B" & row & ":" & "B" & row + NumOper - 1).value = wb.Sheets(2).range(ThisWorkbook.Sheets("TCWork").range("J61").value & ThisWorkbook.Sheets("TCWork").range("K61").value & ":" & ThisWorkbook.Sheets("TCWork").range("J61").value & ThisWorkbook.Sheets("TCWork").range("K72").value).value
+        transl.Sheets(1).range("A" & row).value = folderPath2 & wb.Sheets(1).range("N49").value & ".slx"
+        transl.Sheets(1).range("D" & row).value = wb.Sheets(1).range("J46").value
+        row = row + NumOper
         wb.Close SaveChanges:=False
         counter = 2
         range12 = ""
@@ -329,6 +367,44 @@ Sub ListFilesInSubFolder(ByVal folderPath As String, ByVal folderPath2 As String
         first = ""
     Next file
     
+    Dim vbComp As Object
+    Dim NewCode As String
+    Dim btn As Button
+
+    NewCode = "Sub transl()" & vbCrLf _
+    & "Dim fso As Object" & vbCrLf _
+    & "Dim wb As Workbook" & vbCrLf _
+    & "Dim NumOper As Integer" & vbCrLf _
+    & "Dim row As Long" & vbCrLf _
+    & "Set fso = CreateObject(""Scripting.FileSystemObject"")" & vbCrLf _
+    & "row = 4" & vbCrLf _
+    & "NumOper = " & NumOper & vbCrLf _
+    & "Do While ThisWorkbook.Sheets(1).range(""A"" & row).value <> 0" & vbCrLf _
+    & "Application.ScreenUpdating = False" & vbCrLf _
+    & "Set wb = Workbooks.Open(ThisWorkbook.Sheets(1).range(""A"" & row).value)" & vbCrLf _
+    & "wb.Worksheets(1).range(""J6:J"" & NumOper + 5).value = ThisWorkbook.Sheets(1).range(""C"" & row & "":"" & ""C"" & row + NumOper - 1).value" & vbCrLf _
+    & "wb.Worksheets(1).range(""J47"").value = ThisWorkbook.Sheets(1).range(""E"" & row).value" & vbCrLf _
+    & "row = row + NumOper" & vbCrLf _
+    & "wb.Close SaveChanges:=True" & vbCrLf _
+    & "Loop" & vbCrLf _
+    & "Set wb = Nothing" & vbCrLf _
+    & "Set fso = Nothing" & vbCrLf _
+    & "End Sub"
+
+    With transl.VBProject.VBComponents
+        Set vbComp = .Add(1)
+    End With
+
+    With vbComp.CodeModule
+        .AddFromString NewCode
+    End With
+    
+    Set btn = transl.Sheets(1).Buttons.Add(6, 4.5, 70, 25)
+    btn.Characters.Text = "Run"
+    btn.OnAction = "'" & transl.FullName & "'!transl"
+    
+    MsgBox "Âûïîëíèòå ïåðåâîä è íàæìèòå êíîïêó Run / Make a translation and press the button Run", vbExclamation
+    transl.Activate
     
     Set pict = Nothing
     Set file = Nothing
@@ -343,4 +419,6 @@ Sub ListFilesInSubFolder(ByVal folderPath As String, ByVal folderPath2 As String
     Set xPic = Nothing
     Set xRg = Nothing
     Set xPicRg = Nothing
+    Set vbComp = Nothing
+    Set btn = Nothing
 End Sub
