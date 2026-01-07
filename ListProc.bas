@@ -34,6 +34,7 @@ Sub A01_ListProc()
     
     For Each file In folder.Files
         If file.Name <> ActiveWorkbook.Name And (file.Attributes And 2) = 0 Then
+            Application.ScreenUpdating = False
             Set wb = Workbooks.Open(file)
             ValueNuProc = wb.Sheets(1).range(Num).value
             
