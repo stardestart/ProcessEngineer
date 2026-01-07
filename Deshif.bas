@@ -1,3 +1,4 @@
+Attribute VB_Name = "Deshif"
 Sub A03_Deshif()
     Dim folderPath As String
     Dim fd As FileDialog
@@ -8,7 +9,7 @@ Sub A03_Deshif()
         folderPath = fd.SelectedItems(1) & "\"
         Call ListFilesInSubFolder(folderPath, 4)
     Else
-        MsgBox "Ïàïêà íå âûáðàíà.", vbExclamation
+        MsgBox "Папка не выбрана.", vbExclamation
     End If
     
     Set fd = Nothing
