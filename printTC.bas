@@ -1,3 +1,4 @@
+Attribute VB_Name = "printTC"
 Sub A06_printTC()
     Dim folderPath As String
     Dim fd As FileDialog
@@ -17,7 +18,6 @@ End Sub
 Sub ListFilesInSubFolder(ByVal folderPath As String)
     Dim fso As Object
     Dim wb As Workbook
-    Dim subFolder As Object
     Dim file As Object
     Dim folder As Object
 
@@ -27,6 +27,7 @@ Sub ListFilesInSubFolder(ByVal folderPath As String)
     Dialog = MsgBox("ДА - Печать ПЕРВОЙ страницы всех книг в папке, НЕТ - Печать всех книг целиком в папке", vbYesNo)
     
     For Each file In folder.Files
+        Application.ScreenUpdating = False
         Set wb = Workbooks.Open(file.Path)
         If Dialog = vbYes Then
             wb.Worksheets(1).PrintOut
