@@ -1,3 +1,4 @@
+Attribute VB_Name = "lnkCreate"
 Sub A04_lnkCreate()
     Dim folderPath As String
     Dim fd As FileDialog
