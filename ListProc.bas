@@ -1,4 +1,6 @@
+Attribute VB_Name = "ListProc"
 Sub A01_ListProc()
+Attribute A01_ListProc.VB_ProcData.VB_Invoke_Func = "o\n14"
 
     Dim file As Object
     Dim folder As Object
