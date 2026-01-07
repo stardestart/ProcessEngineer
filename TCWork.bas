@@ -1,3 +1,4 @@
+Attribute VB_Name = "TCWork"
 Sub A07_TCWork()
     Dim folderPath As String
     Dim fd As FileDialog
@@ -8,13 +9,13 @@ Sub A07_TCWork()
     If fd.Show = -1 Then
         folderPath = fd.SelectedItems(1) & "\"
     Else
-        MsgBox "Ïàïêà íå âûáðàíà.", vbExclamation
+        MsgBox "Папка не выбрана.", vbExclamation
         Exit Sub
     End If
     If fd.Show = -1 Then
         folderPath2 = fd.SelectedItems(1) & "\"
     Else
-        MsgBox "Ïàïêà íå âûáðàíà.", vbExclamation
+        MsgBox "Папка не выбрана.", vbExclamation
         Exit Sub
     End If
     Call ListFilesInSubFolder(folderPath, folderPath2)
@@ -403,7 +404,7 @@ Sub ListFilesInSubFolder(ByVal folderPath As String, ByVal folderPath2 As String
     btn.Characters.Text = "Run"
     btn.OnAction = "'" & transl.FullName & "'!transl"
     
-    MsgBox "Âûïîëíèòå ïåðåâîä è íàæìèòå êíîïêó Run / Make a translation and press the button Run", vbExclamation
+    MsgBox "Выполните перевод и нажмите кнопку Run / Make a translation and press the button Run", vbExclamation
     transl.Activate
     
     Set pict = Nothing
